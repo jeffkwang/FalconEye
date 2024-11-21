@@ -18,7 +18,7 @@ SCROLL_PAUSE_TIME = 2  # Adjust this based on the site's loading time
 
 last_height = driver.execute_script("return document.body.scrollHeight")
 i = 0
-while i < 25:
+while i < 50:
     # Scroll down
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     time.sleep(SCROLL_PAUSE_TIME)
@@ -49,6 +49,27 @@ for content in soup.select("div.content_wrap"):
             text = post_caption.get_text(strip=True)
             posts.append(text)
 
-with open("data/posts.csv", "w", newline="", encoding="utf-8") as file:
-    for idx, txt in enumerate(posts, 1):
-        file.write("{}, {}\n".format(idx, txt))
+with open("data/posts.jsonl", "w", newline="", encoding="utf-8") as file:
+    for txt in posts:
+        file.write(fr"""
+        {{
+            "messages": [
+                {{
+                    "role": "user",
+                    "parts": [
+                        {{
+                            "text": "{txt}"
+                        }}
+                    ]
+                }},
+                {{
+                    "role": "model",
+                    "parts": [
+                        {{
+                            "text": "microaggression"
+                        }}
+                    ]
+                }}
+            ]
+        }}
+        """)
